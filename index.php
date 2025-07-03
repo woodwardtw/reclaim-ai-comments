@@ -66,7 +66,7 @@ function maddeness_openai_ai_comment($post_id) {
         $sample = get_field('sample_post', 'user_' . $commenter_id);
 
         // Build prompt for OpenAI
-        $prompt = "{$content}\n\nRespond to this post. Keep it short and like a normal blog comment. Your personality is: {$personality}. Your writing style is: {$style}. A sample of your type of post is: {$sample}.";
+        $prompt = "{$content}\n\nRespond to this post. Keep it short and like a normal blog comment. Do not reference players or information after 2001. Your personality is: {$personality}. Your writing style is: {$style}. A sample of your type of post is: {$sample}.";
 
         // Prepare OpenAI API request
         $data = [
@@ -111,7 +111,7 @@ function maddeness_openai_ai_comment($post_id) {
             }
         }
 
-        sleep(1); // Optional pause between requests
+        sleep(1); //  Pause between requests
     }
     curl_close($ch);
 }
