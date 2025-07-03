@@ -45,7 +45,7 @@ function maddeness_openai_ai_comment($post_id, $override_user_ids = null) {
         return;
     }
 
-    $comment_number = get_field('initial_comments');
+    $comment_number = (int) get_field('initial_comments');
     $comment_number = (is_numeric($comment_number) && $comment_number > 0) ? $comment_number : 1;
 
     $commenters = ai_maddeness_get_random_author($comment_number, $override_user_ids);
