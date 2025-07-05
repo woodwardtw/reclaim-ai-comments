@@ -31,7 +31,7 @@ function maddeness_openai_enqueue_scripts() {
 
 require plugin_dir_path(__FILE__) . '/inc/data.php';
 
-add_action('publish_post', 'maddeness_openai_ai_comment');
+add_action('publish_post', 'maddeness_openai_ai_comment', 10, 2 );
 function maddeness_openai_ai_comment($post_id, $override_user_ids = null) {
     $apiKey = get_field('open_ai_key', 'option');
     if (empty($apiKey)) {
@@ -45,8 +45,11 @@ function maddeness_openai_ai_comment($post_id, $override_user_ids = null) {
         return;
     }
 
-    $comment_number = (int) get_field('initial_comments');
-    $comment_number = (is_numeric($comment_number) && $comment_number > 0) ? $comment_number : 1;
+    $comment_number = (int) get_field('initial_comments', $post_id);
+    // write_log(__LINE__);
+    // write_log($post_id);
+    // write_log($comment_number);
+    //$comment_number = (is_numeric($comment_number) && $comment_number > 0) ? $comment_number : 1;
 
     $commenters = ai_maddeness_get_random_author($comment_number, $override_user_ids);
     if (empty($commenters)) {
@@ -97,7 +100,7 @@ function generate_ai_comment($post_id, $user_id, $apiKey, $parent_comment_id = n
 Respond in a natural blog comment style. Keep it short. Do not reference players or information after 2001.
 Your personality is: {$personality}
 Your writing style is: {$style}
-A sample of your posts is: {$sample}
+A sample of your comment style is: {$sample}
 PROMPT;
 
     $data = [
