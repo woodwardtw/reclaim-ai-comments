@@ -31,7 +31,7 @@ function maddeness_openai_enqueue_scripts() {
 
 require plugin_dir_path(__FILE__) . '/inc/data.php';
 
-add_action('publish_post', 'maddeness_openai_ai_comment', 10, 2 );
+add_action('acf/save_post', 'maddeness_openai_ai_comment', 10, 1 );
 function maddeness_openai_ai_comment($post_id, $override_user_ids = null) {
     $apiKey = get_field('open_ai_key', 'option');
     if (empty($apiKey)) {
@@ -45,11 +45,8 @@ function maddeness_openai_ai_comment($post_id, $override_user_ids = null) {
         return;
     }
 
-    $comment_number = (int) get_field('initial_comments', $post_id);
-    // write_log(__LINE__);
-    // write_log($post_id);
-    // write_log($comment_number);
-    //$comment_number = (is_numeric($comment_number) && $comment_number > 0) ? $comment_number : 1;
+    $comment_number = max(1, (int) get_field('initial_comments', $post_id));
+
 
     $commenters = ai_maddeness_get_random_author($comment_number, $override_user_ids);
     if (empty($commenters)) {
@@ -94,14 +91,14 @@ function generate_ai_comment($post_id, $user_id, $apiKey, $parent_comment_id = n
     $sample = get_field('sample_post', 'user_' . $user_id);
 
     $prompt = <<<PROMPT
-{$post_content}
-{$parent_comment_text}
+    {$post_content}
+    {$parent_comment_text}
 
-Respond in a natural blog comment style. Keep it short. Do not reference players or information after 2001.
-Your personality is: {$personality}
-Your writing style is: {$style}
-A sample of your comment style is: {$sample}
-PROMPT;
+    Respond in a natural blog comment style. Keep it short. Do not reference players or information after 2001.
+    Your personality is: {$personality}
+    Your writing style is: {$style}
+    A sample of your comment style is: {$sample}
+    PROMPT;
 
     $data = [
         "model" => "gpt-4o",
@@ -130,14 +127,16 @@ PROMPT;
     return $responseData['choices'][0]['message']['content'] ?? '';
 }
 
+
 function ai_maddeness_get_random_author($number = 1, $override_user_ids = null) {
+ 
     if (!empty($override_user_ids)) {
         $user_ids = is_array($override_user_ids) ? $override_user_ids : [$override_user_ids];
         return get_users(['include' => $user_ids]);
     }
 
     $all_users = get_users(['role' => 'subscriber']);
-    shuffle($all_users);
+    shuffle($all_users);    
     return array_slice($all_users, 0, $number);
 }
 
